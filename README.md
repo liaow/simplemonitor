@@ -6,6 +6,7 @@ Documentation is here:
 http://jamesoff.github.io/simplemonitor/
 
 wechat configure section in monitor.ini
+```xml
 [wechat]
 type=wechat
 appid=appid1234567890
@@ -13,3 +14,4 @@ secret=secret1234567890
 template=templateid1234567890
 users=openid1,openid2
 redis=redis://[:password]@host:port/database
+```
