@@ -32,6 +32,7 @@ import Alerters.syslogger
 import Alerters.execute
 import Alerters.slack
 import Alerters.pushover
+import Alerters.wechat
 
 
 VERSION = "1.7"
@@ -238,6 +239,8 @@ def load_alerters(m, config, quiet):
             a = Alerters.slack.SlackAlerter(config_options)
         elif type == "pushover":
             a = Alerters.pushover.PushoverAlerter(config_options)
+        elif type == "wechat":
+            a = Alerters.wechat.WechatAlerter(config_options)
         else:
             sys.stderr.write("Unknown alerter type %s\n" % type)
             continue
