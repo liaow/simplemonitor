@@ -7,10 +7,9 @@ import os
 import sys
 import time
 
-from ConfigParser import *
+from envconfig import EnvironmentAwareConfigParser
 from optparse import *
 from socket import gethostname
-
 
 import Monitors.monitor
 import Monitors.network
@@ -80,7 +79,7 @@ def get_config_dict(config, monitor):
 
 def load_monitors(m, filename, quiet):
     """Load all the monitors from the config file and return a populated SimpleMonitor."""
-    config = ConfigParser()
+    config = EnvironmentAwareConfigParser()
     config.read(filename)
     monitors = config.sections()
     if "defaults" in monitors:
@@ -202,6 +201,8 @@ def load_loggers(m, config, quiet):
             l = Loggers.file.HTMLLogger(config_options)
         elif type == "network":
             l = Loggers.network.NetworkLogger(config_options)
+        elif type == "json":
+            l = Loggers.file.JsonLogger(config_options)
         else:
             sys.stderr.write("Unknown logger type %s\n" % type)
             continue
@@ -263,6 +264,7 @@ def main():
     parser.add_option("-N", "--no-network", dest="no_network", default=False, action="store_true", help="Disable network listening socket")
     parser.add_option("-d", "--debug", dest="debug", default=False, action="store_true", help="Enable debug output")
     parser.add_option("-f", "--config", dest="config", default="monitor.ini", help="configuration file")
+    parser.add_option("-H", "--no-heartbeat", action="store_true", dest="no_heartbeat", default=False, help="Omit printing the '.' character when running checks")
 
     (options, args) = parser.parse_args()
 
@@ -279,7 +281,7 @@ def main():
         print "SimpleMonitor v%s" % VERSION
         print "--> Loading main config from %s" % options.config
 
-    config = ConfigParser()
+    config = EnvironmentAwareConfigParser()
     if not os.path.exists(options.config):
         print '--> Configuration file "%s" does not exist!' % options.config
         sys.exit(1)
@@ -385,7 +387,7 @@ def main():
             m.do_alerts()
             m.do_logs()
 
-            if not options.quiet and not options.verbose:
+            if not options.quiet and not options.verbose and not options.no_heartbeat:
                 heartbeat += 1
                 if heartbeat == 2:
                     sys.stdout.write(".")
